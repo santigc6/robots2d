@@ -59,11 +59,11 @@ for matrix in p:
 ################## FIGURE FROM BMP - END ##################
 
 ################## PARAMETERS TO DEFINE WHAT FIGURE TO USE ##################
-MAX_ROBOTS=MAX_ROBOTS2
-#MAX_ROBOTS=MAX_ROBOTS1
+MAX_ROBOTS=MAX_ROBOTS1
+#MAX_ROBOTS=MAX_ROBOTS2
 
-figure1=figure3
-#figure1=figure2
+figure1=figure2
+#figure1=figure3
 
 MAX_AGENTS_MOVING=24
 ################## END OF PARAMETERS ##################
@@ -91,6 +91,8 @@ class RobotAgent(Agent):
         self.isMoving = False
         self.finished = False
         self.prevPos=None
+        self.noMoveCount=0
+        self.isTunneled=False
         
         if robot_type == 0:
             self.location=loc
@@ -212,6 +214,8 @@ class RobotAgent(Agent):
                 orderedNeighborhood=[]
                 neighborhoodList = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False)
                 neighborhoodOrder=[6,5,3,0,1,2,4,7]
+                if self.isTunneled:
+                    neighborhoodOrder=[7,6,5,3,0,1,2,4]
                 orderedNeighborhood=[neighborhoodList[i] for i in neighborhoodOrder]+[neighborhoodList[i] for i in neighborhoodOrder]
 
                 # Check toroidal neighbors
@@ -240,6 +244,11 @@ class RobotAgent(Agent):
                             continue
                 
                 if hasMoved==False:
+                    if self.noMoveCount < 4: # Max of 3 time units without moving to previous position
+                        self.noMoveCount+=1
+                    else:
+                        self.prevPos=None
+                        self.noMoveCount=0
                     return
                 
                 self.hasGradient=False
@@ -254,8 +263,28 @@ class RobotAgent(Agent):
                     isNeighbor=False
                     hasMoved=False
                     if self.shape[self.location[0]][self.location[1]]==1: # robot is inside the shape
+                        tunneled1=[3,5,4,7]
+                        tunneled2=[0,3,2,4]
+                        neighborhoodList = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False)
+                        self.isTunneled=True
+                        for i in tunneled1:
+                            agentsInCell=self.model.grid.get_cell_list_contents(neighborhoodList[i])
+                            if len(agentsInCell)<=0:
+                                self.isTunneled=False
+                            elif len(agentsInCell)>0 and agentsInCell[0].finished==False:
+                                self.isTunneled=False
+                        
+                        if self.isTunneled==False:
+                            self.isTunneled=True
+                            for i in tunneled2:
+                                agentsInCell=self.model.grid.get_cell_list_contents(neighborhoodList[i])
+                                if len(agentsInCell)<=0:
+                                    self.isTunneled=False
+                                elif len(agentsInCell)>0 and agentsInCell[0].finished==False:
+                                    self.isTunneled=False
+                        
                         for neighbor in self.model.grid.neighbor_iter(self.pos): # determine whether a neighbor has the same gradient
-                            if neighbor.gradient == self.gradient and neighbor.isMoving == False:
+                            if neighbor.gradient == self.gradient and neighbor.isMoving == False and self.isTunneled==False:
                                 self.finished = True
                                 self.isMoving=False
                                 self.model.movingAgents-=1
@@ -265,6 +294,8 @@ class RobotAgent(Agent):
                         orderedNeighborhood=[]
                         neighborhoodList = self.model.grid.get_neighborhood(self.pos, moore=True, include_center=False)
                         neighborhoodOrder=[6,5,3,0,1,2,4,7]
+                        if self.isTunneled:
+                            neighborhoodOrder=[7,6,5,3,0,1,2,4]
                         orderedNeighborhood=[neighborhoodList[i] for i in neighborhoodOrder]+[neighborhoodList[i] for i in neighborhoodOrder]
                         isNeighbor=False
                         hasMoved=False
@@ -282,7 +313,7 @@ class RobotAgent(Agent):
                                     
                         new_location=self.positionToLocation(self.pos, self.location, new_position)
                         
-                        if new_location[0]<0 or new_location[1]<0 or new_location[0]>=MAX_PIXELS or new_location[1]>=MAX_PIXELS or self.shape[new_location[0]][new_location[1]]==0: # if it is about to leave the figure
+                        if new_location[0]<0 or new_location[1]<0 or new_location[0]>=MAX_PIXELS or new_location[1]>=MAX_PIXELS or self.shape[new_location[0]][new_location[1]]==0 or new_position==self.prevPos: # if it is about to leave the figure
                             self.finished = True
                             self.isMoving=False
                             self.model.movingAgents-=1
@@ -391,7 +422,7 @@ class Robot2D(Model):
 
     def step(self):
         """
-        Run one step of the model. If All agents are happy, halt the model.
+        Run one step of the model.
         """
         # collect data
         self.datacollector.collect(self)
