@@ -42,4 +42,5 @@ El resultado que se obtiene en ambas es el que podemos ver en los vídeos coment
 
 * Rubenstein, M., Cornejo, A., & Nagpal, R. (2014). Programmable self-assembly in a thousand-robot swarm. _Science_, 345(6198), 795-799.
 * https://towardsdatascience.com/introduction-to-mesa-agent-based-modeling-in-python-bcb0596e1c9a
+* https://mesa.readthedocs.io/en/stable/
 * https://github.com/glucee/Multilateration
