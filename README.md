@@ -4,7 +4,7 @@ Este proyecto da una implementación basada en Rubenstein _et al._ (1995) de un 
 
 # Instalación
 
-Instalar los paquetes de Python 3 que aparecen en el archivo **requirements.txt**. No obstante, debería ser suficientes con
+Instalar los paquetes de Python 3 que aparecen en el archivo **requirements.txt**. No obstante, debería ser suficiente con
 
 ```{bash}
 pip install mesa
