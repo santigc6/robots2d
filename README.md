@@ -38,6 +38,8 @@ figure1=figure3
 
 El resultado que se obtiene en ambas es el que podemos ver en los vídeos comentados anteriormente.
 
+El notebook **experiments.ipynb** contiene algunos experimentos llevados a cabo para la importación de las figuras, multilateración, etc.
+
 # Referencias
 
 * Rubenstein, M., Cornejo, A., & Nagpal, R. (2014). Programmable self-assembly in a thousand-robot swarm. _Science_, 345(6198), 795-799.
