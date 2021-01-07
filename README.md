@@ -36,7 +36,7 @@ MAX_ROBOTS=MAX_ROBOTS2
 figure1=figure3
 ```
 
-El resultado que se obtiene en ambas es el que podemos ver en los vídeos comentados anteriormente,
+El resultado que se obtiene en ambas es el que podemos ver en los vídeos comentados anteriormente.
 
 # Referencias
 
